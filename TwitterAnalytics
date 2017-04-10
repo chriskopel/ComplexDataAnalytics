@@ -1,0 +1,55 @@
+#Good reference for customizing pulls: http://bogdanrau.com/blog/collecting-tweets-using-r-and-the-twitter-search-api/
+library(twitteR)
+library(ROAuth)
+library(base64enc)
+library(tm)
+library(wordcloud)
+
+setwd("x")
+
+#set keys to variables
+consumer_key <- 'y'
+consumer_secret <- 'z'
+access_token <- 'yy'
+access_secret <- 'zz'
+
+#load and access creds
+load("twitter authentication.Rdata")
+setup_twitter_oauth(consumer_key, consumer_secret, access_token, access_secret)
+
+#set variables for search settings
+search.string <- "#trump"
+no.of.tweets <- 1000
+#query, then post as df
+tweets <- searchTwitter(search.string, n=no.of.tweets, lang="en")
+tweets.df <- twListToDF(tweets)
+
+###Begin Wordcloud
+# Create corpus for Tweets
+corpus=Corpus(VectorSource(tweets.df$text))
+
+# Convert to lower-case, remove punctuation, remove numbers
+corpus=tm_map(corpus, removePunctuation)
+corpus=tm_map(corpus,tolower)
+corpus=tm_map(corpus, removeNumbers)
+
+# Remove stopwords
+corpus=tm_map(corpus,function(x) removeWords(x,stopwords()))
+corpus=tm_map(corpus, removeWords, c("like", "just", "will", "following", "today", "know", "httpstcoiopxooak", "trumps", "trump", "election"))
+
+# convert corpus to a Plain Text Document
+corpus=tm_map(corpus,PlainTextDocument)
+
+#CREATE WORDCLOUD
+col=brewer.pal(6,"Dark2")
+wordcloud(corpus, min.freq=25, scale=c(5,2),rot.per = 0.25,
+          random.color=T, max.word=45, random.order=F,colors=col)
+
+#TERM FREQUENCY
+corpusPTD <- tm_map(corpus, PlainTextDocument)
+dtm <- DocumentTermMatrix(corpusPTD)
+termFreq <- colSums(as.matrix(dtm))
+
+tf <- data.frame(term = names(termFreq), freq = termFreq)
+tf <- tf[order(-tf[,2]),]
+head(tf, n = 25)
