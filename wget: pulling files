@@ -1,0 +1,65 @@
+wget --user-agent="Chromium51.0/Version 51.0.2704.79 Ubuntu 16.04 (64-bit)" -P/x/y/Documents/wget/wget_files/ http://www.bbc.com/
+
+wget --user-agent="Chromium51.0/Version 51.0.2704.79 Ubuntu 16.04 (64-bit)" -P/x/y/Documents/wget/wget_files/ -O bbc.html http://www.bbc.com/
+
+wget --user-agent="Chromium51.0/Version 51.0.2704.79 Ubuntu 16.04 (64-bit)" -O/x/y/Documents/wget/wget_files/bbc.html http://www.bbc.com/ 
+
+wget --user-agent="Chromium51.0/Version 51.0.2704.79 Ubuntu 16.04 (64-bit)" -O/x/y/Documents/wget/wget_files/test1.html http://www.bbc.com/news/world-latin-america-37603836
+
+
+
+wget --random-wait -r -U "Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.0.3) Gecko/2008092416 Firefox/3.0.3 -P/x/y/Documents/wget/wget_full/ --no-clobber --domains website.org --no-parent --limit-rate=200k 
+#wait b/w .5-1.5 seconds b/w each download #recursive (entire site) #fake user-agent #file path #dont overwrite existing files	#dont follow links outside website	#dont follow links outside directory #limit cap at 200kb
+ 
+
+
+
+wget --spider --server-response http://example.com/file.iso
+#check how big example site is 
+
+*look into:
+--random-wait option
+wget --mirror --random-wait -R gif,jpg,pdf <url>
+#-R rejects listed files
+
+wget --mirror --page-requisites --adjust-extension --no-parent --convert-links
+     --directory-prefix=sox http://stackoverflow.com/x
+	 
+	 
+wget --recursive --random-wait -U "Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.0.3) Gecko/2008092416 Firefox/3.0.3" -P/x/y/Documents/wget/wget_full/ --no-clobber --domains website.org -e robots=off -R gif,jpg,pdf http://www.bbc.com/
+#only pulling the home page
+
+wget --recursive --random-wait --no-clobber --page-requisites --html-extension --convert-links --restrict-file-names=windows --domains website.org --no-parent -U "Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.0.3) Gecko/2008092416 Firefox/3.0.3" -P/x/y/Documents/wget/wget_full/ -e robots=off -R gif,jpg,pdf http://www.bbc.com/
+
+wget --recursive --random-wait --no-clobber --user-agent="Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.0.3) Gecko/2008092416 Firefox/3.0.3" -P/x/y/Documents/wget/wget_full/ -e robots=off -R gif,jpg,pdf --no-parent http://www.bbc.com/news/world
+#this seems to work, going off of /news
+
+---end bbc---
+
+---begin et al---
+#NPR
+wget --recursive --random-wait --no-clobber --user-agent="Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.0.3) Gecko/2008092416 Firefox/3.0.3" -P/x/y/Documents/wget/wget_full/ -e robots=off -R gif,jpg,pdf,htm --no-parent http://www.usatoday.com
+--Status: Running. Pulling lots of video files. Will need to delete these
+
+wget -r --no-clobber --user-agent="Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.0.3) Gecko/2008092416 Firefox/3.0.3" -P/x/y/Documents/wget/wget_full/ -e robots=off -R gif,jpg,pdf,htm --no-parent http://www.bostonglobe.com
+
+wget -r --no-clobber --user-agent="Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.0.3) Gecko/2008092416 Firefox/3.0.3" -P/x/y/Documents/wget/wget_full/ -e robots=off --no-parent http://www.usatoday.com
+
+FOR /R %f IN (*.) DO REN "%f" *.html 
+#Use the above code to rename all the blank files to .html
+
+for /d /r . %d in (slideshows) do @if exist "%d" rd /s/q "%d"
+#use to delete all subfolders with the name about-npr
+
+cd C:\x\y\Documents\wget\wget_full\www.latimes.com
+#change directory
+
+#delete certain files
+find . -name "index.html" -type f
+
+#rstuff:
+article.slim = gsub('Ã¢Â€Â™', '', article.text)
+article.slimmer = gsub('Ã¢Â€Âœ','', article.slim)
+article.final = gsub('Ã¢Â€Â','', article.slimmer)
+#good article to examine for a negative classification:
+C:/x/y/Documents/wget/wget_full/www.nytimes.com/2016/07/10/business/investors-get-stung-twice-by-executives-lavish-pay-packages.html.html
