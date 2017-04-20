@@ -1,0 +1,56 @@
+#check the current directory that R is pointed to
+getwd() 
+
+#now change the current directory to the cnn folder containing all the files
+setwd("C:/x/y/Documents/Data Projects/Composite Files")  
+
+#check to make sure the current directory is now set to what you want
+getwd()
+
+#now list the files/folders to verify 
+list.files(path = "C:/x/y/Documents/wget/wget_full/www.npr.org/2001..2016", pattern = ".html")
+
+#R is now pointing to the correct folders, but not the index.html files that we are looking for...
+
+#but now it sees them!
+list.files(pattern = ".html", recursive = TRUE)
+
+#read the number of lines of a file
+x <- readLines("C:/x/y/Documents/wget/wget_full/www.npr.org/2016/10/11/497196091/top-court-hears-case-on-racial-bias-in-jury-deliberations.html")
+print(x)
+
+#XML package
+library(XML)
+# Read and parse HTML file
+doc.html = htmlTreeParse(x, useInternal = TRUE)
+
+# Extract all the paragraphs (HTML tag is p, starting at
+# the root of the document). Unlist flattens the list to
+# create a character vector.
+doc.text = unlist(xpathApply(doc.html, '//title', xmlValue))
+
+# Replace all \n by spaces
+doc.text = gsub('\\n', ' ', doc.text)
+
+# Join all the elements of the character vector into a single
+# character string, separated by spaces
+doc.text = paste(doc.text, collapse = ' ')
+View(doc.text)
+
+###combine csv
+filenames <- list.files(path = "C:/x/y/Documents/Data Projects/Composite Files", pattern = ".csv" )
+setwd("C:/x/y/Documents/Data Projects/Composite Files")
+df <- do.call("rbind", lapply(filenames, read.csv, header = TRUE))
+write.csv(df, file = "totalComp.csv",row.names=FALSE, na="")
+
+
+setwd("C:/x/y/Documents/wget/wget_full/www.nbcnews.com")
+###change file extensions
+oldFiles <- list.files(path = "C:/x/y/Documents/wget/wget_full/www.denverpost.com", all.files = T, full.names = T, recursive = T)
+newFiles <-paste(sep="",oldFiles,".html")
+  for (i in 1:length(oldFiles)){ 
+       tryCatch({file.rename(oldFiles[i],newFiles[i])
+           }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
+          print (i)
+  }
+#(this was rough, renamed all files (even .html) to .html, but still worked overall!)
