@@ -1,0 +1,50 @@
+#XML package
+library(XML)
+
+#now change the current directory to the fox folder containing all the files
+setwd("C:/x/y/Documents/wget/wget_full/www.foxnews.com")  
+
+#point to the folder with the articles
+totArticles <- list.files(path = "C:/x/y/Documents/wget/wget_full/www.foxnews.com", all.files = T, full.names = T, recursive = T, pattern = ".html")
+
+
+#create a data frame with the columns you desire
+newsFrame <- data.frame("News"=character(), "Title" = character(), "Date" = as.Date(character()), 
+                        "Article" = character(),stringsAsFactors = FALSE)
+
+#insert the rows into the data frame, and then remember to save the data frame for later use
+#also add counter to see progress of loop
+for(i in 1:length(totArticles)){
+  tryCatch({
+    x <- readLines(totArticles[i], warn = FALSE)
+    
+    title.html = htmlTreeParse(x, useInternal = TRUE)
+    title.text = unlist(xpathApply(title.html, '//h1[@itemprop="headline"]', xmlValue))
+    title.final = gsub("[^A-Za-z0-9]", " ", title.text)
+    
+    article.html = htmlTreeParse(x, useInternal = TRUE)
+    article.text = unlist(xpathApply(article.html,'//p',xmlValue))
+    article.text = gsub('\\n', ' ', article.text)
+    article.text = gsub('\\t', ' ', article.text)
+    article.trim = gsub("[^A-Za-z0-9]", " ", article.text)
+    article.trimmed = trimws(article.trim)
+    article.final = paste(article.trimmed, collapse = ' ')
+    
+    date.html = htmlTreeParse(x, useInternal = TRUE)
+    date.text = unlist(xpathApply(date.html,'//time[@itemprop="datePublished"]',xmlValue)[1])
+    date.final = substr(date.text, regexpr("\t\t", date.text)+2, 1990:2016)
+    date.trimmed = trimws(date.final)
+    
+    newsFrame <- rbind(newsFrame, data.frame("News"="Fox", "Title"=title.final, "Date" = date.trimmed, "Article"=article.final))
+  }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
+  print(i)
+}
+
+#select only unique values
+finNewsFrame <- unique(newsFrame)
+df <- finNewsFrame[!duplicated(finNewsFrame$Title), ]
+
+# Write CSV in R
+write.csv(df, file = "fox.csv", row.names=FALSE, na="")
+
+df1 <- read.csv("C:/x/y/Documents/Data Projects/Composite Files/fox.csv", stringsAsFactors = FALSE)
