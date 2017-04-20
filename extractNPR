@@ -1,0 +1,40 @@
+#XML package
+library(XML)
+
+#now change the current directory to the npr folder containing all the files
+setwd("C:/y/x/Documents/wget/wget_full/www.npr.org")  
+
+#but now it sees them!
+list.files(path ="C:/y/x/Documents/wget/wget_full/www.npr.org", pattern = ".html", recursive = TRUE, full.names = T)
+totArticles <- list.files(path ="C:/y/x/Documents/wget/wget_full/www.npr.org", pattern = ".html", recursive = TRUE, full.names = T)
+
+#create a data frame with the columns you desire
+newsFrame <- data.frame("News"=character(), "Title" = character(), "Date" = as.Date(character()), 
+                        "Article" = character(),stringsAsFactors = FALSE)
+
+#insert the rows into the data frame, and then remember to save the data frame for later use
+#also add counter to follow loop progress
+for(i in 1:length(totArticles)){
+  tryCatch({
+  x <- readLines(totArticles[i], warn = FALSE)
+  
+  title.html = htmlTreeParse(x, useInternal = TRUE)
+  title.text = unlist(xpathApply(title.html, '//title', xmlValue))
+  title.text = paste(title.text, collapse = ' ')
+  
+  article.html = htmlTreeParse(x, useInternal = TRUE)
+  article.text = unlist(xpathApply(article.html,'//p',xmlValue))
+  article.text = gsub('\\n', ' ', article.text)
+  article.text = paste(article.text, collapse = ' ')
+  
+  date.html = htmlTreeParse(x, useInternal = TRUE)
+  date.text = unlist(xpathApply(date.html,'//span[@class="date"]',xmlValue))
+  
+  newsFrame <- rbind(newsFrame, data.frame("News"="NPR", "Title"=title.text, "Date" = date.text [1], "Article"=article.text))
+  }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
+}
+
+# Write CSV in R
+write.csv(newsFrame, file = "composNews.csv",row.names=FALSE, na="")
+
+df <- read.csv("C:/y/x/Documents/Data Projects/Composite Files/composNews.csv", stringsAsFactors = FALSE)
